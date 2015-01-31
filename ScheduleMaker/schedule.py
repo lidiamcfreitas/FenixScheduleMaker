@@ -9,11 +9,11 @@ import string
 # https://fenix.tecnico.ulisboa.pt/disciplinas/PEst11645/2014-2015/2-semestre
 
 def processTime(timeString):
-    dayString = timeString[:3]
+    dayString = timeString[:3] # gets day from timeString
     timeString = timeString[timeString.find(":")-2:]
-    beginString = timeString[:5]
-    timeString = timeString[3:]
-    endString = timeString[timeString.find(":")-2:]
+    beginString = timeString[:5] #gets begining of class
+    timeString = timeString[3:]  
+    endString = timeString[timeString.find(":")-2:] # gets end of class
     
     begin = int(beginString[:2]) + int(beginString[-2:])/60
     end = int(endString[:2]) + int(endString[-2:])/60
@@ -67,8 +67,80 @@ def printShifts(shift = []):
             print(key)
             for time in classtype[key]:
                 print("\t",time[0:])
-
+                
+                
     
+def combineCourse(course):
+    t = course.getTeoricas()
+    pb = course.getProblemas()
+    l = course.getLabs()
+    possibles = []
+    possible = []
+    group = []
+    count = 0
+
+    for teorica in t:
+        #print("cenas 1.1")
+        for problemas in pb:
+            #print("cenas 1.2")
+            for labs in l:
+                #print("cenas 1.3")
+                test = combine(teorica, problemas, labs)
+                if test == -1:
+                    break;
+
+                count +=1
+                print(count, test)
+                group += test
+                
+    
+    return group
+
+def combine(teorica, problemas, labs):
+    combos = []
+    
+    for t_aula in teorica:
+        #print(t_aula[0])
+        for pb_aula in problemas:
+            #print(pb_aula[0])
+            if t_aula[0] == pb_aula[0]:  # mesmo dia T e PB
+                if not possibleToCombine(t_aula[1], t_aula[2], pb_aula[1], pb_aula[2]):
+                    return -1
+                for l_aula in labs:
+                    #print("cenas 3")
+                    if t_aula[0] == l_aula[0]: # mesmo dia T e L
+                        if possibleToCombine(t_aula[1], t_aula[2], l_aula[1], l_aula[2]) and possibleToCombine(pb_aula[1], pb_aula[2], l_aula[1], l_aula[2]):
+                            combos += [(teorica, problemas, labs)] #adiciona
+                        else:
+                            return -1
+                    else:
+                        if not possibleToCombine(pb_aula[1], pb_aula[2], t_aula[1], t_aula[2]):
+                            return -1
+                        else:
+                            combos += [(teorica, problemas, labs)] #adiciona                          
+            else: # diferente dia T e PB
+                for l_aula in labs:
+                    #print("cenas 3")
+                    if pb_aula[0] == l_aula[0]: # mesmo dia PB e L
+                        if not possibleToCombine(pb_aula[1], pb_aula[2], l_aula[1], l_aula[2]):
+                            return -1
+                        else:
+                            combos += [(teorica, problemas, labs)] # adiciona
+                    else: # diferente dia PB e L
+                        if l_aula[0] == t_aula[0]:
+                            if not possibleToCombine(l_aula[1], l_aula[2], t_aula[1], t_aula[2]):
+                                return -1
+                            else:
+                                combos += [(teorica, problemas, labs)] #adiciona                            
+                
+                
+    return [(teorica, problemas, labs)]
+
+
+def possibleToCombine(min1, max1, min2, max2):
+    
+    return (max1 < min2 or max2 < min1)
+
 class Course:
     
         name = ""
@@ -84,16 +156,41 @@ class Course:
             self.shifts = processCourse(self.name,course)
         
         def addTeorica(self,day,num, begin, end):
-            self.diyCourse += [[self.name+"T"+num, "    ", day+", "+begin+" something "+end+""]]
+            self.diyCourse += [[self.name+"T"+num," ",day+", "+begin+end]]
+            self.actualize() 
 
         
         def addProblemas(self,day,num, begin, end):
-            self.diyCourse += [[self.name+"PB"+num, "    ", day+", "+begin+" something "+end+""]]  
+            self.diyCourse += [[self.name+"PB"+num," ",day+", "+begin+end]] 
+            self.actualize()
+
+        def addLabs(self,day,num, begin, end):
+            self.diyCourse += [[self.name+"L"+num," ",day+", "+begin+end]] 
+            self.actualize()
+
 
         def actualize(self):
             self.input = self.diyCourse
-            self.shifts = processCourse(self.name,self.diyCourse)            
+            self.shifts = processCourse(self.name,self.diyCourse)
         
+        def getTeoricas(self):
+            res = []
+            for key in self.shifts[0]:
+                res += [self.shifts[0][key]]
+                        
+            return res
+        
+        def getProblemas(self):
+            res = []
+            for key in self.shifts[1]:
+                res += [self.shifts[1][key]]            
+            return res
+        
+        def getLabs(self):
+            res = []
+            for key in self.shifts[2]:
+                res += [self.shifts[2][key]]
+            return res
         
 
 class Schedule:
@@ -142,8 +239,13 @@ class Schedule:
             
     def addCourse(self, course):
         self.objects += [course]
+        
+    def combineSchedules(self):
+        
+        return 
 
 x = Schedule()
+
 c = Course("PE1234",[])
 c.addTeorica("Seg","01","17:30","19:00")
 c.addTeorica("Ter","01","17:30","19:00")
@@ -155,9 +257,13 @@ c.addProblemas("Sex","04","14:30","16:00")
 c.addProblemas("Seg","05","14:30","16:00")
 c.addProblemas("Qua","06","17:30","19:00")
 c.addProblemas("Sex","07","13:00","14:30")
-c.actualize()
-x.addCourse(c)
 
+c.addLabs("Qua","06","20:30","22:00")
+c.addLabs("Sex","07","05:00","06:30")
+
+
+c.actualize() 
+x.addCourse(c)
 
 
 #x.insertUrl()
@@ -165,5 +271,8 @@ x.addCourse(c)
 #x.insertUrl()    
 #x.insertUrl()
 
-#x.printObjects()
-    
+x.printObjects()
+
+
+
+# combineCourse(x.objects[0])
