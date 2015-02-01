@@ -1,5 +1,6 @@
 import urllib.request
 import string
+from tkinter import *
 
 # https://fenix.tecnico.ulisboa.pt/disciplinas/TCom511/2014-2015/2-semestre
 # https://fenix.tecnico.ulisboa.pt/disciplinas/IPM2011/2014-2015/2-semestre
@@ -8,7 +9,9 @@ import string
 
 # https://fenix.tecnico.ulisboa.pt/disciplinas/PEst11645/2014-2015/2-semestre
 
-def processTime(timeString):
+
+def processTime(courseClass, courseName):
+    timeString = courseClass[2]
     dayString = timeString[:3] # gets day from timeString
     timeString = timeString[timeString.find(":")-2:]
     beginString = timeString[:5] #gets begining of class
@@ -17,14 +20,16 @@ def processTime(timeString):
     
     begin = int(beginString[:2]) + int(beginString[-2:])/60
     end = int(endString[:2]) + int(endString[-2:])/60
-    return tuple((dayString,begin,end))
+    
+    return tuple((dayString,begin,end, courseName))
 
 
 def processCourse(courseName,course = []):
     classTypes = [{},{},{}]
     for courseClass in course:
         shift = courseClass[0][len(courseName):]
-        time = processTime(courseClass[2])
+        time = processTime(courseClass, courseName)
+        print(time)
         if shift.find("T") == 0:
             
             if shift in classTypes[0].keys():
@@ -42,7 +47,8 @@ def processCourse(courseName,course = []):
             if shift in classTypes[1].keys():
                 classTypes[2][shift] += [time]
             else:
-                classTypes[2][shift] = [time] 
+                classTypes[2][shift] = [time]
+    
     return classTypes
     
     
@@ -70,103 +76,124 @@ def printShifts(shift = []):
                 
                 
     
-def combineCourse(course):
-    t = course.getTeoricas()
-    pb = course.getProblemas()
-    l = course.getLabs()
-    possibles = []
-    possible = []
+def combineCourse2(course1, course2):
+    print(2*'\n\t',course1, course2)
+    master = [course1,course2]
     group = []
-    count = 0
+    
+    n = len(master)
+    count=0
     defaultL = [("None", 0,0)]
     defaultP = [("Nune",0,0)]
     defaultT = [("Nane",0,0)]
 
-    if len(t) == 0:
+    if n <= 0:
         print("fuck off, do a real course")
         
-    for teorica in t:
-        #print("cenas 1.1")
-        if len(pb) == 0:
-            if len(l) == 0:
-                test = combine(teorica, defaultP, defaultL)
-                if test == -1:
-                    break;
-                group += test                
-            else:
-                for labs in l:
-                    test = combine(teorica, defaultP, labs)
-                    if test == -1:
-                        break;
-                    group += test                    
-        for problemas in pb:
-            #print("cenas 1.2")
-            if len(l) == 0:
-                test = combine(teorica, problemas, defaultL)
-                if test == -1:
-                    break;
-                group += test                
+    else:
+        tipoAula1 = master[0]
+        for tipoAula2 in master:
+            if tipoAula2 == master[0]:
                 continue
-            for labs in l:
-                #print("cenas 1.3")
-                test = combine(teorica, problemas, labs)
-                if test == -1:
-                    break;
-
-                count +=1
-                print(count, test)
-                group += test
+            else:
+                #print(len(tipoAula1))
+                #print(len(tipoAula2))
+                tipoAula1 = combine(tipoAula1,tipoAula2)
                 
+
+    return  tipoAula1
     
-    return len(group)
+    
+def combineCourse(course):
+    defaultL = [("None", 0,0)]
+    defaultP = [("Nune",0,0)]
+    defaultT = [("Nane",0,0)]
+    t = course.getTeoricas()
+    pb = course.getProblemas()
+    if len(pb)==0:
+        pb=[defaultP]
+    
+    l = course.getLabs()
+    if len(l)==0:
+        l=[defaultL]
+    
+    master = [t,pb,l]
+    print(master)
+    group = []
+    
+    n = len(master)
+    count=0
 
-def combine(teorica, problemas, labs):
-    combos = []
-    print (len(labs))
-    for t_aula in teorica:
-        #print(t_aula[0])
-        for pb_aula in problemas:
-            #print(pb_aula[0])
-            if t_aula[0] == pb_aula[0]:  # mesmo dia T e PB
-                if not possibleToCombine(t_aula[1], t_aula[2], pb_aula[1], pb_aula[2]):
-                    return -1
-                for l_aula in labs:
-                    #print("cenas 3")
-                    if t_aula[0] == l_aula[0]: # mesmo dia T e L
-                        if possibleToCombine(t_aula[1], t_aula[2], l_aula[1], l_aula[2]) and possibleToCombine(pb_aula[1], pb_aula[2], l_aula[1], l_aula[2]):
-                            combos += [(teorica, problemas, labs)] #adiciona
-                        else:
-                            return -1
-                    else:
-                        print("T=P")
-                        if not possibleToCombine(pb_aula[1], pb_aula[2], t_aula[1], t_aula[2]):
-                            return -1
-                        else:
-                            combos += [(teorica, problemas, labs)] #adiciona                          
-            else: # diferente dia T e PB
-                for l_aula in labs:
-                    #print("cenas 3")
-                    if pb_aula[0] == l_aula[0]: # mesmo dia PB e L
-                        if not possibleToCombine(pb_aula[1], pb_aula[2], l_aula[1], l_aula[2]):
-                            return -1
-                        else:
-                            combos += [(teorica, problemas, labs)] # adiciona
-                    else: # diferente dia PB e L
-                        print("T!=P")
-                        if l_aula[0] == t_aula[0]:
-                            if not possibleToCombine(l_aula[1], l_aula[2], t_aula[1], t_aula[2]):
-                                return -1
-                            else:
-                                combos += [(teorica, problemas, labs)] #adiciona                            
-                    
+    if n <= 0:
+        print("fuck off, do a real course")
+        
+    else:
+        tipoAula1 = master[0]
+        for tipoAula2 in master:
+            if tipoAula2 == master[0]:
+                continue
+            else:
+                print(len(tipoAula1))
+                print(len(tipoAula2))
+                tipoAula1 = combine(tipoAula1,tipoAula2)
                 
-    print("Return")
-    return [(teorica, problemas, labs)]
+
+    return tipoAula1
+
+def combine(aula1, aula2):
+    grupo = []
+    teste = []
+    for turma1 in aula1:
+        for turma2 in aula2:
+            #print(len(turma1), len(turma2), (turma1),(turma2))
+            teste = combineTurmas(turma1, turma2)
+            
+            if teste == -1:
+                continue
+            else:
+                grupo += [teste]
+    
+    return grupo
+    
+def combineTurmas(turma1, turma2):
+    
+    if len(turma1)==0 or len(turma2)==0:
+        raise Exception("I know python!")
+    
+    for hora1 in turma1:
+        for hora2 in turma2:
+            if hora1[0] == hora2[0]: #mesmo dia
+                if not possibleToCombine(hora1[1],hora1[2],hora2[1],hora2[2]):
+                    return -1
+                
+    #print("\t", turma1, turma2)
+    '''
+    if len(turma1))==1 and len(turma2)==1:
+        return [turma1[0], turma2[0]]
+    elif len(turma1)==1:
+        return turma1[0] + turma2
+    elif len(turma2)==1:
+        return turma1 + turma2[0]
+    return '''
+    return turma1 + turma2
 
 
 def possibleToCombine(min1, max1, min2, max2):
     
-    return (max1 < min2 or max2 < min1)
+    return (max1 <= min2 or max2 <= min1)
+
+def printVect(vectToPrint):
+    
+    s = ""
+    for array in vectToPrint:
+        if isinstance(array, tuple):
+            return "\t" + str(array[0]) +" "+ str(array[1]) +" "+ str(array[2])
+        else:
+            s += printVect(array)
+        s += '\n'
+    return  s+'\n'
+    
+
 
 class Course:
     
@@ -272,7 +299,7 @@ class Schedule:
         return 
 
 x = Schedule()
-
+'''
 c = Course("PE1234",[])
 c.addTeorica("Seg","01","17:30","19:00")
 c.addTeorica("Ter","01","17:30","19:00")
@@ -283,14 +310,28 @@ c.addProblemas("Qui","03","14:30","16:00")
 c.addProblemas("Sex","04","14:30","16:00")
 c.addProblemas("Seg","05","14:30","16:00")
 c.addProblemas("Qua","06","17:30","19:00")
-c.addProblemas("Sex","07","13:00","14:30")
+c.addProblemas("Sex","07","13:00","14:30")'''
+
+
+c = Course("PE1234",[])
+c.addTeorica("Seg","01","17:30","19:00")
+c.addTeorica("Ter","01","17:30","19:00")
+
+c.addProblemas("Qui","03","14:30","16:00")
+c.addProblemas("Sex","04","14:30","16:00")
+c.addProblemas("Seg","05", "18:00", "19:00")
+
 
 #c.addLabs("Qua","06","20:30","22:00")
-#c.addLabs("Sex","07","05:00","06:30")
+c.addLabs("Sab","07","05:00","06:30")
+c.addLabs("Sex","08","15:00","16:00")
 
 
 c.actualize() 
 x.addCourse(c)
+
+array = combineCourse(x.objects[0])[0]
+print(array)
 
 
 #x.insertUrl()
@@ -303,3 +344,41 @@ x.addCourse(c)
 
 
 # combineCourse(x.objects[0])
+
+def graph():
+    master = Tk()
+    
+    w = Canvas(master, width=1000, height=600)
+    w.pack()
+    
+    #w.create_line(0, 0, 200, 100)
+    #w.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
+    
+    for i in range(6):
+        w.create_line(i*200,0,i*200,600)
+        
+    for i in range(24):
+        w.create_line(0,i*25,1000,i*25)
+          
+    
+    for aula in array:
+        if aula[0] == "Seg":
+            w.create_rectangle(0,aula[1]/24*600, 200, aula[2]/24*600, fill="red")
+        if aula[0] == "Ter":
+            w.create_rectangle(200,aula[1]/24*600, 400, aula[2]/24*600, fill="red")
+        if aula[0] == "Qua":
+            w.create_rectangle(400,aula[1]/24*600, 600, aula[2]/24*600, fill="red")
+        if aula[0] == "Qui":
+            w.create_rectangle(600,aula[1]/24*600, 800, aula[2]/24*600, fill="red")
+        if aula[0] == "Sex":
+            w.create_rectangle(800,aula[1]/24*600, 1000, aula[2]/24*600, fill="red") 
+            
+    t = Label(w, text="Hello John, Michael, Eric, ...", anchor='w')
+    
+    mainloop() 
+
+
+#w.create_line(0, 0, 100, 100, fill="blue")
+#w.create_line(0,100, 200, 100, fill="red")
+
+
