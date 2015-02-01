@@ -1,6 +1,9 @@
 import urllib.request
 import string
 from tkinter import *
+B = 0
+
+numSchedules = 0
 
 # https://fenix.tecnico.ulisboa.pt/disciplinas/TCom511/2014-2015/2-semestre
 # https://fenix.tecnico.ulisboa.pt/disciplinas/IPM2011/2014-2015/2-semestre
@@ -29,7 +32,7 @@ def processCourse(courseName,course = []):
     for courseClass in course:
         shift = courseClass[0][len(courseName):]
         time = processTime(courseClass, courseName)
-        print(time)
+        #print(time)
         if shift.find("T") == 0:
             
             if shift in classTypes[0].keys():
@@ -77,7 +80,7 @@ def printShifts(shift = []):
                 
     
 def combineCourse2(course1, course2):
-    print(2*'\n\t',course1, course2)
+    #print(2*'\n\t',course1, course2)
     master = [course1,course2]
     group = []
     
@@ -118,7 +121,7 @@ def combineCourse(course):
         l=[defaultL]
     
     master = [t,pb,l]
-    print(master)
+    #print(master)
     group = []
     
     n = len(master)
@@ -133,8 +136,8 @@ def combineCourse(course):
             if tipoAula2 == master[0]:
                 continue
             else:
-                print(len(tipoAula1))
-                print(len(tipoAula2))
+                #print(len(tipoAula1))
+                #print(len(tipoAula2))
                 tipoAula1 = combine(tipoAula1,tipoAula2)
                 
 
@@ -330,8 +333,7 @@ c.addLabs("Sex","08","15:00","16:00")
 c.actualize() 
 x.addCourse(c)
 
-array = combineCourse(x.objects[0])[0]
-print(array)
+#array = combineCourse2(combineCourse(x.objects[0]),combineCourse(x.objects[1])
 
 
 #x.insertUrl()
@@ -346,36 +348,52 @@ print(array)
 # combineCourse(x.objects[0])
 
 def graph():
+    global B
     master = Tk()
     
-    w = Canvas(master, width=1000, height=600)
+    w = Canvas(master, width=1200, height=800)
     w.pack()
     
     #w.create_line(0, 0, 200, 100)
     #w.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
     
-    for i in range(6):
+    for i in range(7):
         w.create_line(i*200,0,i*200,600)
         
-    for i in range(24):
-        w.create_line(0,i*25,1000,i*25)
-          
-    
-    for aula in array:
-        if aula[0] == "Seg":
-            w.create_rectangle(0,aula[1]/24*600, 200, aula[2]/24*600, fill="red")
-        if aula[0] == "Ter":
-            w.create_rectangle(200,aula[1]/24*600, 400, aula[2]/24*600, fill="red")
-        if aula[0] == "Qua":
-            w.create_rectangle(400,aula[1]/24*600, 600, aula[2]/24*600, fill="red")
-        if aula[0] == "Qui":
-            w.create_rectangle(600,aula[1]/24*600, 800, aula[2]/24*600, fill="red")
-        if aula[0] == "Sex":
-            w.create_rectangle(800,aula[1]/24*600, 1000, aula[2]/24*600, fill="red") 
+    for i in range(25):
+        w.create_line(0,i*25,1200,i*25)
             
-    t = Label(w, text="Hello John, Michael, Eric, ...", anchor='w')
+    E1 = Entry(width=150).pack(side=LEFT)
+    
+    B = Button(text ="Hello", command = lambda: graphSchedule(w)).pack(side=RIGHT)    
     
     mainloop() 
+
+
+
+def graphSchedule(w):
+    global numSchedules
+    #print(numSchedules, array)
+    case = array[numSchedules]
+    #print(case)
+    #print()
+    if numSchedules != len(array)-1:
+        numSchedules += 1
+    else:
+        return
+    print(numSchedules, case)
+    
+    for aula in case:
+        if aula[0] == "Seg":
+            w.create_rectangle(200,aula[1]/24*600, 400, aula[2]/24*600, fill="grey")
+        if aula[0] == "Ter":
+            w.create_rectangle(400,aula[1]/24*600, 600, aula[2]/24*600, fill="grey")
+        if aula[0] == "Qua":
+            w.create_rectangle(600,aula[1]/24*600, 800, aula[2]/24*600, fill="grey")
+        if aula[0] == "Qui":
+            w.create_rectangle(800,aula[1]/24*600, 1000, aula[2]/24*600, fill="grey")
+        if aula[0] == "Sex":
+            w.create_rectangle(1000,aula[1]/24*600, 1200, aula[2]/24*600, fill="grey") 
 
 
 #w.create_line(0, 0, 100, 100, fill="blue")
