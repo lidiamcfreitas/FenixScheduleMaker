@@ -363,11 +363,15 @@ def graph():
     for i in range(25):
         w.create_line(0,i*25,1200,i*25)
             
-    E1 = Entry(width=150).pack(side=LEFT)
+    E1 = Entry(width=100).pack(side=LEFT)
     
-    B = Button(text ="Hello", command = lambda: graphSchedule(w)).pack(side=RIGHT)    
+    B1 = Button(text ="Graph", command = lambda: graphSchedule(w)).pack(side=RIGHT)    
+    B2 = Button(text ="Delete Canvas", command = lambda: deleteCanvas(w)).pack(side=RIGHT) 
     
     mainloop() 
+    
+def deleteCanvas(w):
+    delete(w)
 
 
 
@@ -386,14 +390,19 @@ def graphSchedule(w):
     for aula in case:
         if aula[0] == "Seg":
             w.create_rectangle(200,aula[1]/24*600, 400, aula[2]/24*600, fill="grey")
+            w.create_text(300, (aula[1]+aula[2])/48*600, text = aula[3])
         if aula[0] == "Ter":
             w.create_rectangle(400,aula[1]/24*600, 600, aula[2]/24*600, fill="grey")
+            w.create_text(500, (aula[1]+aula[2])/48*600, text = aula[3])
         if aula[0] == "Qua":
             w.create_rectangle(600,aula[1]/24*600, 800, aula[2]/24*600, fill="grey")
+            w.create_text(700, (aula[1]+aula[2])/48*600, text = aula[3])
         if aula[0] == "Qui":
             w.create_rectangle(800,aula[1]/24*600, 1000, aula[2]/24*600, fill="grey")
+            w.create_text(900, (aula[1]+aula[2])/48*600, text = aula[3])
         if aula[0] == "Sex":
-            w.create_rectangle(1000,aula[1]/24*600, 1200, aula[2]/24*600, fill="grey") 
+            w.create_rectangle(1000,aula[1]/24*600, 1200, aula[2]/24*600, fill="grey")
+            w.create_text(1100, (aula[1]+aula[2])/48*600, text = aula[3])
 
 
 #w.create_line(0, 0, 100, 100, fill="blue")
