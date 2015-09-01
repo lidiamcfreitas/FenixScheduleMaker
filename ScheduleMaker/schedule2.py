@@ -2,7 +2,6 @@ import urllib.request
 import string
 from tkinter import *
 
-fuck = open('working.txt', 'r+')
 numSchedules = 0
 
 def processTime(courseClass, courseName):
