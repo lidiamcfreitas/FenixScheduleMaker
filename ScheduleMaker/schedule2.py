@@ -503,7 +503,7 @@ def sortSmallestIntervall():
         array[i] = [timeSum,iniTime]+array[i]
     
         
-    array = sorted(array, key=lambda classSche: (classSche[0], classSche[1])) # sort first by sum of time and then by initials
+    array = sorted(array, key=lambda classSche: (classSche[0], -classSche[1])) # sort first by sum of time and then by initials
     
     for i in range(len(array)):
         array[i] = array[i][2:]
@@ -516,9 +516,9 @@ def menuChooseClass():
     print(0,"Teorica")
     print(1, "Pratica")
     print(2, "Lab")
-    typeOption = input('Escolhe o tipo de aula')
+    typeOption = input('Escolhe o numero do tipo de aula: ')
     print(x.objects[int(courseOption)].shifts[int(typeOption)])
-    classOption = input('Escolhe o turno, por exemplo L01')
+    classOption = input('Escolhe o turno, por exemplo L01: ')
     print(x.objects[int(courseOption)].shifts[int(typeOption)][classOption])
     newDic = {}
     newDic[classOption] = x.objects[int(courseOption)].shifts[int(typeOption)][classOption]
