@@ -503,7 +503,7 @@ def sortSmallestIntervall():
         array[i] = [timeSum,iniTime]+array[i]
     
         
-    array = sorted(array, key=lambda classSche: (classSche[0], -classSche[1])) # sort first by sum of time and then by initials
+    array = sorted(array, key=lambda classSche: (classSche[0], classSche[1])) # sort first by sum of time and then by initials
     
     for i in range(len(array)):
         array[i] = array[i][2:]
@@ -530,3 +530,4 @@ def menuChooseClass():
 
 makeArray()
 sortSmallestIntervall()
+graph()
