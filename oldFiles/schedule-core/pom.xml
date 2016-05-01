@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.fenixedu</groupId>
+        <artifactId>fenix-framework-project</artifactId>
+        <version>1.3.0</version>
+        <relativePath></relativePath>
+    </parent>
+
+    <groupId>1</groupId>
+    <artifactId>schedule-core</artifactId>
+    <version>1</version>
+    <packaging>jar</packaging>
+
+    <name>Schedule</name>
+
+    <properties>
+        <version.org.fenixedu.bennu>3.0.0</version.org.fenixedu.bennu>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-server</artifactId>
+            <version>${version.org.fenixedu.bennu}</version>
+        </dependency>
+        <!-- PLACE YOUR PROJECT DEPENDENCIES HERE -->
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>fenix-ashes-maven-repository</id>
+            <url>https://fenix-ashes.ist.utl.pt/nexus/content/groups/fenix-ashes-maven-repository</url>
+        </repository>
+    </repositories>
+    
+    <dependency>
+        <groupId>org.fenixedu</groupId>
+        <artifactId>feaf4j-api</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.fenixedu</groupId>
+        <artifactId>feaf4j-okhttp</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+    
+    <repository>
+        <id>fenix-ashes-maven-repository</id>
+        <url>https://fenix-ashes.ist.utl.pt/nexus/content/groups/fenix-ashes-maven-repository</url>
+    </repository>
+    
+</project>
